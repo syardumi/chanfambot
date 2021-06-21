@@ -2,13 +2,14 @@ const Watermelons = require('./watermelons');
 const Songs = require('./songs')
 const AmongUs = require('./amongUs')
 const RequestTokens = require('./requestTokens')
+const config = require('./.env.js')
 
 const tmi = require('tmi.js');
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
 open({
-  filename: '/home/syardumi/chanfambot.db',
+  filename: config.dbLocation,
   driver: sqlite3.cached.Database
 }).then((db) => {
   // Called every time a message comes in
@@ -48,14 +49,10 @@ open({
         secure: true
     },
     identity: {
-      username: 'chanfambot',
-      password: 'oauth:c9q3pr36gnly00bd8u0lggfs197bzv'
+      username: config.oauthUsername,
+      password: config.oauthPassword
     },
-    channels: [
-      'thefinaledge',
-      'chanfambot',
-      'jeanettemusic'
-    ]
+    channels: config.channels
   };
 
   // Create a client with our options
