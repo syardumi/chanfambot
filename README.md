@@ -1,12 +1,22 @@
-## ANYONE
+# ChanFamBot
+
+- ChanFamBot does everything Chan Fam needs. Need watermelons? It's got you. Need to know when the next hypetrain is? It's there. Let it take care of YOU.
+
+---
+
+## Live Learn & Song Bump Tokens (!token)
+
+- JeanetteMusic: Tokens represent a $5 (or equivalent) donation - 1 for a song bump, 3 for a live learn
+  
+### *ANYONE*
 
 **!token**
 - check tokens for this user
 
 **!token rules**
--  says the rules
+-  shows the rules for tokens on this channel
 
-## MODS ONLY
+### *MODS ONLY*
 
 **!token help**
 - shows an example
@@ -19,6 +29,7 @@
 
 **!token (add|give) {@user} {# of tokens}** OR **!token (add|give) {# of tokens} {@user}**
 - gives # of tokens to user
+- max is 30
 
 **!token (take|sub|subtract|remove|rm|ll|llearn|livelearn|live learn|bump|songbump|song bump) {@user} {# of tokens} {song title}**
 - take tokens from user, optionally save the song title
@@ -31,3 +42,24 @@
 
 **!token (modhistory|mod history) {@mod}**
 - show mod token history (last 5)
+
+---
+
+## Watermelons (!watermelon)
+
+### *ANYONE*
+
+**!watermelon**
+- gives out one of 1,000,000 watermelons kept and cared for by EpicMousie
+
+---
+
+## JeanetteMusic 
+
+### *ANYONE*
+
+**!3sides**
+
+---
+
+## HypeTrain (COMING SOON)

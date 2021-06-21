@@ -1,6 +1,6 @@
-const LIVE_LEARN_TOKEN = 3
-const BUMP_TOKEN = 1
-const DOLLARS_TO_ONE_TOKEN = 5
+const LIVE_LEARN_TOKEN = 3 // TODO: change this to a channel setting
+const BUMP_TOKEN = 1 // TODO: change this to a channel setting
+const DOLLARS_TO_ONE_TOKEN = 5 // TODO: change this to a channel setting
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
