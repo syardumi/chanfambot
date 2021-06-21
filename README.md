@@ -17,7 +17,7 @@
 **!token {@user}**
 - check tokens for the specified user
 
-**!token (add|give) {@user} {# of tokens}**
+**!token (add|give) {@user} {# of tokens}** OR **!token (add|give) {# of tokens} {@user}**
 - gives # of tokens to user
 
 **!token (take|sub|subtract|remove|rm|ll|llearn|livelearn|live learn|bump|songbump|song bump) {@user} {# of tokens} {song title}**
