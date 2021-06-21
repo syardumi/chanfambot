@@ -70,7 +70,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
     }
 
     // MODS ONLY
-    if (context['mod'] === true || context['badges']['vip'] === '1' || context['username'] === 'thefinaledge') {
+    if (context['mod'] === true || context['username'] === 'thefinaledge') {
       //  - !token help :: shows example
       if (chatMsg === '!token help' || chatMsg === '!tokens help') {
         client.say(target, `Example: !token {operation} {@user} {# of tokens} {song title}`);
