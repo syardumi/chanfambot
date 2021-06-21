@@ -1,0 +1,17 @@
+{
+  "name": "chanfambot",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Steve Yardumian",
+  "license": "MIT",
+  "dependencies": {
+    "numeral": "2.0.6",
+    "sqlite": "4.0.23",
+    "sqlite3": "5.0.2",
+    "tmi.js": "1.8.3"
+  }
+}
