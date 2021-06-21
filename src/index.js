@@ -8,7 +8,7 @@ const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
 open({
-  filename: '/tmp/database.db',
+  filename: '/home/syardumi/chanfambot.db',
   driver: sqlite3.cached.Database
 }).then((db) => {
   // Called every time a message comes in
