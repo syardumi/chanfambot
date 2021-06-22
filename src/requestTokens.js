@@ -63,7 +63,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
 
     //  - !token rules :: says the rules
     if (chatMsg === '!token rules' || chatMsg === '!tokens rules') {
-      client.say(target, `$15 donation or 5 gift subs for ${LIVE_LEARN_TOKEN} tokens = live learn; $5 or 1 gift sub for ${BUMP_TOKEN} token = song bump`);
+      client.say(target, `A live learn (5 tokens) is a donation of $15, 1500 bits, or 5 gift subs to the channel. A song bump (1 token) is a donation of $5, 500 bits, or 1 gift sub to the channel.`);
       console.log(`* Executed ${chatMsg} command`);
       return
     }
