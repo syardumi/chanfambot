@@ -1,5 +1,6 @@
 const LIVE_LEARN_TOKEN = 5 // TODO: change this to a channel setting
 const BUMP_TOKEN = 1 // TODO: change this to a channel setting
+const MAX_GIVE_TOKENS = 100
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -100,7 +101,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
 
       //  - !token add {@user} {# of tokens} :: add tokens to user
       if ((operation === 'add' || operation === 'give') && username && numOfTokens) {
-        if (numOfTokens > 30) numOfTokens = 30
+        if (numOfTokens > MAX_GIVE_TOKENS) numOfTokens = MAX_GIVE_TOKENS
 
         let result = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, channel)
         
