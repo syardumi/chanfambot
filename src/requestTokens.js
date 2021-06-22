@@ -1,6 +1,5 @@
-const LIVE_LEARN_TOKEN = 3 // TODO: change this to a channel setting
+const LIVE_LEARN_TOKEN = 5 // TODO: change this to a channel setting
 const BUMP_TOKEN = 1 // TODO: change this to a channel setting
-const DOLLARS_TO_ONE_TOKEN = 5 // TODO: change this to a channel setting
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -53,7 +52,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
       const result = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', context['username'], channel)
       
       if (result) {
-        client.say(target, `@${context['username']} has ${result.tokens} tokens left`);
+        client.say(target, `@${context['username']} has ${result.tokens} token(s) left`);
       } else {
         client.say(target, `@${context['username']} has no tokens right now`);
       }
@@ -64,7 +63,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
 
     //  - !token rules :: says the rules
     if (chatMsg === '!token rules' || chatMsg === '!tokens rules') {
-      client.say(target, `Roughly $${DOLLARS_TO_ONE_TOKEN} for each token; ${LIVE_LEARN_TOKEN} tokens for a live learn; ${BUMP_TOKEN} token for a song bump`);
+      client.say(target, `$15 donation or 5 gift subs for ${LIVE_LEARN_TOKEN} tokens = live learn; $5 or 1 gift sub for ${BUMP_TOKEN} token = song bump`);
       console.log(`* Executed ${chatMsg} command`);
       return
     }
@@ -90,7 +89,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
         const result = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, channel)
         
         if (result) {
-          client.say(target, `@${username} has ${result.tokens} tokens left`);
+          client.say(target, `@${username} has ${result.tokens} token(s) left`);
         } else {
           client.say(target, `@${username} has no tokens right now`);
         }
@@ -125,7 +124,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
         )
 
         result = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, channel)
-        client.say(target, `Mod<${context['username']}> adds ${numOfTokens} tokens to @${username}. They now have ${result.tokens} tokens`);  
+        client.say(target, `Mod<${context['username']}> adds ${numOfTokens} token(s) to @${username}. They now have ${result.tokens} token(s).`);  
         console.log(`* Executed ${chatMsg} command`);
         return
       }
@@ -153,7 +152,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
           
           if (!result || result.tokens - numOfTokens < 0) {
             const userTokens = result ? result.tokens : 0
-            client.say(target, `@${username} only has ${userTokens} tokens, so it's a no go!`)
+            client.say(target, `@${username} only has ${userTokens} token(s), so it's a no go!`)
             console.log(`* Executed ${chatMsg} command`);
             return
           } else {
@@ -170,7 +169,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
           )
 
           result = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, channel)
-          client.say(target, `Mod<${context['username']}> subtracts ${numOfTokens} tokens from @${username}${songTitle ? ' for ' + songTitle : ''}${numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ' (song bump)'}. They now have ${result.tokens} tokens.`);  
+          client.say(target, `Mod<${context['username']}> subtracts ${numOfTokens} token(s) from @${username}${songTitle ? ' for ' + songTitle : ''}${numOfTokens === BUMP_TOKEN ? ' (song bump)' : numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} token(s).`);  
           console.log(`* Executed ${chatMsg} command`);
           return
       }
