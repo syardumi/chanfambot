@@ -29,7 +29,7 @@
 
 **!token (add|give) {@user} {# of tokens}** OR **!token (add|give) {# of tokens} {@user}**
 - gives # of tokens to user
-- max is 30
+- max is 100
 
 **!token (take|sub|subtract|remove|rm|ll|llearn|livelearn|live learn|bump|songbump|song bump) {@user} {# of tokens} {song title}**
 - take tokens from user, optionally save the song title
