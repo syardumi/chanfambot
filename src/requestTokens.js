@@ -113,8 +113,8 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
           )
         } else {
           await db.run(
-            'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ?',
-            result.tokens + numOfTokens, Math.floor(new Date() / 1000), context['username'], username
+            'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
+            result.tokens + numOfTokens, Math.floor(new Date() / 1000), context['username'], username, channel
           )          
         }
 
@@ -158,8 +158,8 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
             return
           } else {
             await db.run(
-              'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ?',
-              result.tokens - numOfTokens, Math.floor(new Date() / 1000), context['username'], username
+              'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
+              result.tokens - numOfTokens, Math.floor(new Date() / 1000), context['username'], username, channel
             )
           }
 
@@ -178,11 +178,11 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
       //  - !token clear {@user} :: set user tokens to zero, clear history using is_cleared flag
       if (operation === 'clear' && username) {
         await db.run(
-          'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ?',
-          0, Math.floor(new Date() / 1000), context['username'], username
+          'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
+          0, Math.floor(new Date() / 1000), context['username'], username, channel
         )  
         await db.run(
-          'UPDATE request_token_history SET is_cleared = 1 WHERE username = ?',
+          'UPDATE request_token_history SET is_cleared = 1 WHERE username = ? and channel = ?',
           username
         )
         client.say(target, `@${username}'s tokens have been cleared`);  
