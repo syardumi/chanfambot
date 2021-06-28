@@ -6,7 +6,7 @@
 
 ## Live Learn & Song Bump Tokens (!token)
 
-- JeanetteMusic: Tokens represent a $5 (or equivalent) donation - 1 for a song bump, 3 for a live learn
+- JeanetteMusic: A live learn (5 tokens) is a donation of $15, 1500 bits, or 5 gift subs to the channel. A song bump (1 token) is a donation of $5, 500 bits, or 1 gift sub to the channel.
   
 ### *ANYONE*
 
@@ -59,7 +59,3 @@
 ### *ANYONE*
 
 **!3sides**
-
----
-
-## HypeTrain (COMING SOON)
