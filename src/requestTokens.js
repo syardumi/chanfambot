@@ -6,6 +6,8 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// TODO: transfer tokens
+
 const RequestTokens = (target, context, chatMsg, client, db) => {
   (async () => {
     const channel = target.substring(1, target.length)
@@ -63,23 +65,23 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
     }
 
     //  - !token rules :: says the rules
-    if (chatMsg === '!token rules' || chatMsg === '!tokens rules') {
+    if (chatMsg.replace(' ', '').includes('!tokenrules') || chatMsg.replace(' ', '').includes('!tokensrules')) {
       client.say(target, `A live learn (5 tokens) is a donation of $15, 1500 bits, or 5 gift subs to the channel. A song bump (1 token) is a donation of $5, 500 bits, or 1 gift sub to the channel.`);
       console.log(`* Executed ${chatMsg} command`);
       return
     }
 
-    // MODS ONLY
-    if (context['mod'] === true || context['username'] === 'thefinaledge') {
+    // BROADCASTER & MODS ONLY
+    if (context['badges']['broadcaster'] === '1' || context['mod'] === true || context['username'] === 'thefinaledge') {
       //  - !token help :: shows example
-      if (chatMsg === '!token help' || chatMsg === '!tokens help') {
+      if (chatMsg.replace(' ', '').includes('!tokenhelp') || chatMsg.replace(' ', '').includes('!tokenshelp')) {
         client.say(target, `Example: !token {operation} {@user} {# of tokens} {song title}`);
         console.log(`* Executed ${chatMsg} command`);
         return
       }
 
       //  - !token operation help :: shows operations
-      if (chatMsg === '!token operation help' || chatMsg === '!tokens operation help') {
+      if (chatMsg.includes('!token operation help') || chatMsg.includes('!tokens operation help')) {
         client.say(target, `Operations: add, give, take, sub, subtract, remove, rm, livelearn, llearn, ll, songbump, bump`);
         console.log(`* Executed ${chatMsg} command`);
         return
