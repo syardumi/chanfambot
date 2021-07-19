@@ -6,7 +6,7 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-// TODO: transfer tokens
+// TODO: restart CF bot every 24 hrs
 
 const RequestTokens = (target, context, chatMsg, client, db) => {
   (async () => {
@@ -14,15 +14,18 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
 
     // parse the command params
     let username
+    let recipient
     let operation
     let numOfTokens
     let songTitle = null
     const parts = chatMsg.split(' ')
     parts.forEach((part) => {
       if (part.includes('!token')) return
-      if (!username) {
-        if (part[0] === '@') {
+      if (!username || ((operation.includes('transfer') || operation.includes('move')) && !recipient)) {
+        if (!username && part[0] === '@') {
           username = part.substring(1, part.length)
+        } else if (!recipient && part[0] === '@') {
+          recipient = part.substring(1, part.length)
         } else if (isNumeric(part)) {
           numOfTokens = parseInt(part)
         } else {
@@ -47,7 +50,7 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
     })
     if (!operation) operation = 'check'
     if (songTitle) songTitle = songTitle.trim()
-    console.log({ username, operation, numOfTokens, songTitle })
+    console.log({ username, recipient, operation, numOfTokens, songTitle })
 
     // ANYONE
     //  - !token :: check tokens for this user
@@ -175,6 +178,54 @@ const RequestTokens = (target, context, chatMsg, client, db) => {
           client.say(target, `Mod<${context['username']}> subtracts ${numOfTokens} token(s) from @${username}${songTitle ? ' for ' + songTitle : ''}${numOfTokens === BUMP_TOKEN ? ' (song bump)' : numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} token(s).`);  
           console.log(`* Executed ${chatMsg} command`);
           return
+      }
+
+      //  - !token (transfer/move) {@user} {@recipient} {# of tokens} 
+      if ((operation.includes('transfer') || operation.includes('move')) && username && recipient && numOfTokens) {
+        if (numOfTokens > MAX_GIVE_TOKENS) numOfTokens = MAX_GIVE_TOKENS
+
+        let usernameResult = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, channel)
+        
+        if (!usernameResult || usernameResult.tokens - numOfTokens < 0) {
+          const userTokens = usernameResult ? usernameResult.tokens : 0
+          client.say(target, `@${username} only has ${userTokens} token(s), so it's a no go!`)
+          console.log(`* Executed ${chatMsg} command`);
+          return
+        }
+
+        await db.run(
+          'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
+          usernameResult.tokens - numOfTokens, Math.floor(new Date() / 1000), context['username'], username, channel
+        )
+
+        let recipientResult = await db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', recipient, channel)
+
+        // insert or update
+        if (!recipientResult) {
+          await db.run(
+            'INSERT INTO request_token (channel, username, tokens, updated_at, updated_by) VALUES (?, ?, ?, ?, ?)',
+            channel, recipient, numOfTokens, Math.floor(new Date() / 1000), context['username']
+          )
+        } else {
+          await db.run(
+            'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
+            recipientResult.tokens + numOfTokens, Math.floor(new Date() / 1000), context['username'], recipient, channel
+          )          
+        }
+
+        // add to history
+        await db.run(
+          'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+          channel, recipient, context['username'], 'add', numOfTokens, Math.floor(new Date() / 1000)
+        )
+        await db.run(
+          'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+          channel, username, context['username'], 'subtract', numOfTokens, Math.floor(new Date() / 1000)
+        )
+
+        client.say(target, `Mod<${context['username']}> transfers ${numOfTokens} token(s) from @${username} to @${recipient}. @${username} has ${usernameResult.tokens - numOfTokens} token(s). @${recipient} has ${recipientResult.tokens + numOfTokens} token(s).`);  
+        console.log(`* Executed ${chatMsg} command`);
+        return
       }
       
       //  - !token clear {@user} :: set user tokens to zero, clear history using is_cleared flag

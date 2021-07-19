@@ -34,6 +34,9 @@
 **!token (take|sub|subtract|remove|rm|ll|llearn|livelearn|live learn|bump|songbump|song bump) {@user} {# of tokens} {song title}**
 - take tokens from user, optionally save the song title
 
+**!token (move|transfer) {@user} {# of tokens} {@recipient}**
+- take tokens from a user, gives that amount to a recipient
+
 **!token clear {@user}**
 - set user tokens to zero, clears history
 
