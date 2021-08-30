@@ -28,7 +28,7 @@ describe('Message', () => {
             }
         }
         const rt = new RequestTokens(client, testDB)
-        
+
         await rt.onMessage('#jeanettemusic', { username: 'thefinaledge' }, '!token')
     })
 
@@ -126,7 +126,7 @@ describe('Message', () => {
     it('does a token add to an existing user', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(7)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -161,7 +161,7 @@ describe('Message', () => {
     it('does a token subtract from an existing user, and they have enough tokens', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(12)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -181,7 +181,7 @@ describe('Message', () => {
     it('does a token subtract from an existing user, and not enough tokens', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(3)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -197,7 +197,7 @@ describe('Message', () => {
     it('does a token subtract from an existing user, using shortcut livelearn command', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(12)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -217,7 +217,7 @@ describe('Message', () => {
     it('does a token subtract from an existing user, using shortcut bump command', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(12)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -237,7 +237,7 @@ describe('Message', () => {
     it('does a token transfer from a user, but user does not exist', async () => {
         const testDB = new RequestTokenTest()
         testDB.setIsNewUser()
-        
+
         const client = {
             say: (target, msg) => {
                 expect(target).toEqual('#jeanettemusic')
@@ -252,7 +252,7 @@ describe('Message', () => {
     it('does a token transfer from a user, but user does not have enough tokens', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(3)
-        
+
         const client = {
             say: (target, msg) => {
                 expect(target).toEqual('#jeanettemusic')
@@ -268,7 +268,7 @@ describe('Message', () => {
         const testDB = new RequestTokenTest()
         testDB.setIsTransfer(true)
         testDB.setTokens(12)
-        
+
         const client = {
             say: (target, msg) => {
                 expect(target).toEqual('#jeanettemusic')
@@ -290,7 +290,7 @@ describe('Message', () => {
         const testDB = new RequestTokenTest()
         testDB.setIsTransfer()
         testDB.setTokens(12)
-        
+
         const client = {
             say: (target, msg) => {
                 expect(target).toEqual('#jeanettemusic')
@@ -311,7 +311,7 @@ describe('Message', () => {
     it('does a token clearing of a user', async () => {
         const testDB = new RequestTokenTest()
         testDB.setTokens(12)
-        
+
 
         const client = {
             say: (target, msg) => {
@@ -324,6 +324,26 @@ describe('Message', () => {
         await rt.onMessage('#jeanettemusic', { username: 'thefinaledge' }, '!token clear @someuser')
         expect(testDB.getChannel()).toEqual('jeanettemusic')
         expect(testDB.getUsername()).toEqual('someuser')
+        expect(testDB.getTokens()).toEqual(0)
+        expect(testDB.getMod()).toEqual('thefinaledge')
+    })
+
+    it('does a token clearing of an assumed user', async () => {
+        const testDB = new RequestTokenTest()
+        testDB.setTokens(12)
+
+
+        const client = {
+            say: (target, msg) => {
+                expect(target).toEqual('#jeanettemusic')
+                expect(msg).toEqual('@thefinaledge\'s tokens have been cleared')
+            }
+        }
+        const rt = new RequestTokens(client, testDB)
+
+        await rt.onMessage('#jeanettemusic', { username: 'thefinaledge' }, '!token clear')
+        expect(testDB.getChannel()).toEqual('jeanettemusic')
+        expect(testDB.getUsername()).toEqual('thefinaledge')
         expect(testDB.getTokens()).toEqual(0)
         expect(testDB.getMod()).toEqual('thefinaledge')
     })
