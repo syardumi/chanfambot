@@ -14,24 +14,75 @@ open({
 }).then((db) => {
   // Called every time a message comes in
   function onMessageHandler (target, context, msg, self) {
-    if (self) { return; } // Ignore messages from the bot
+    if (self) return // Ignore messages from the bot
+    if (context["message-type"] !== 'chat') return // ignore messages that are not chat type
 
     // Remove whitespace from edges of chat message
     const chatMsg = msg.trim().toLowerCase();
 
-    // ----- CHAT MESSAGES -----
-    if (context["message-type"] === 'chat') {
+    // console.log(context)
 
-      if (chatMsg.includes('!token')) {
-        RequestTokens(target, context, chatMsg, client, db)
-      }
-
-      Watermelons(target, context, chatMsg, client)
-      
-      Songs(target, context, chatMsg, client)
-
-      // AmongUs(target, context, chatMsg, client)
+    if (config.modules.requestTokens) {
+      rt.onMessage(target, context, chatMsg)
     }
+
+    if (config.modules.watermelons) {
+      Watermelons(target, context, chatMsg, client)
+    }
+    
+    if (config.modules.songs) {
+      Songs(target, context, chatMsg, client)
+    }
+
+    if (config.modules.amongUs) {
+      AmongUs(target, context, chatMsg, client)
+    }
+  }
+
+  function onSubHandler (target, username, methods, msg, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onReSubHandler (target, username, streakMonths, msg, tags, methods) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onSubGiftHandler (target, username, streakMonths, recipient, methods, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onSubMysteryHandler (target, username, giftSubCount, methods, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, giftSubCount)
+  }
+
+  function onPrimeUpgradeHandler (target, username, methods, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onGiftUpgradeHandler (target, username, sender, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onAnonGiftUpgradeHandler (target, username, tags) {
+    // console.log(target)
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  }
+
+  function onRawMsgHandler(msg) {
+    const bits = parseInt(msg.tags.bits)
+    let target
+    msg.params.forEach((param) => {
+      if (param.includes('#')) {
+        target = param
+      }
+    })
+    if (bits && config.modules.requestTokens) rt.onBits(target, msg.tags['display-name'], bits)
   }
 
   // Called every time the bot connects to Twitch chat
@@ -39,8 +90,8 @@ open({
     console.log(`* Connected to ${addr}:${port}`);
   }
 
-  // Define configuration options
-  const opts = {
+  // Create a client with our options
+  const client = new tmi.client({
     options: {
       debug: false
     },
@@ -53,13 +104,21 @@ open({
       password: config.oauthPassword
     },
     channels: config.channels
-  };
-
-  // Create a client with our options
-  const client = new tmi.client(opts);
+  });
+  const rt = new RequestTokens(client, db)
 
   // // Register our event handlers (defined below)
+  client.on('raw_message', onRawMsgHandler)
   client.on('message', onMessageHandler);
+
+  client.on('sub', onSubHandler)
+  client.on('resub', onReSubHandler)
+  client.on('subgift', onSubGiftHandler)
+  client.on('submysterygift', onSubMysteryHandler)
+  client.on('primepaidupgrade', onPrimeUpgradeHandler)
+  client.on('giftpaidupgrade', onGiftUpgradeHandler)
+  client.on('anongiftpaidupgrade', onAnonGiftUpgradeHandler)
+
   client.on('connected', onConnectedHandler);
 
   // // Connect to Twitch:

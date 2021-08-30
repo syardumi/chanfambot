@@ -7,26 +7,25 @@ function rollDice () {
 }
 
 const Watermelons = (target, context, chatMsg, client) => {
-  // ----- ANYONE -----
-  if (chatMsg.includes('!watermelon')) {
-    // give out some watermelons
+  if (!chatMsg.includes('!watermelon')) return
 
-    const num = rollDice();
+  // ----- ANYONE ----- give out some watermelons
 
-    // personalize
-    let owner = '@' + context['display-name']
-    if (chatMsg.includes('@')) {
-      const chatParts = chatMsg.split(' ')
-      chatParts.forEach(function (part) {
-        if (part.includes('@')) {
-          owner = part
-        }
-      })
-    }
+  const num = rollDice();
 
-    client.say(target, `${owner}, you get to take home watermelon #${numeral(num).format('0,0')}. Be good to it!`);
-    console.log(`* Executed ${chatMsg} command`);
+  // personalize
+  let owner = '@' + context['display-name']
+  if (chatMsg.includes('@')) {
+    const chatParts = chatMsg.split(' ')
+    chatParts.forEach(function (part) {
+      if (part.includes('@')) {
+        owner = part
+      }
+    })
   }
+
+  client.say(target, `${owner}, you get to take home watermelon #${numeral(num).format('0,0')}. Be good to it!`);
+  console.log(`* Executed ${chatMsg} command`);
 }
 
 module.exports = Watermelons
