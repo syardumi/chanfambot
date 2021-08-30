@@ -16,10 +16,10 @@ class RequestTokens {
   }
 
   init () {
-    this.username
-    this.recipient
-    this.operation
-    this.numOfTokens
+    this.username = undefined
+    this.recipient = undefined
+    this.operation = undefined
+    this.numOfTokens = undefined
     this.songTitle = null
   }
 
@@ -76,7 +76,7 @@ class RequestTokens {
 
       await this.tokenAdd(true)
     }
-    
+
     // console.log(`Bits - ${username} ${numOfBits}`)
     // 500 bits = 1 token, 1000 bits = 3 tokens, 1500 bits = 5 tokens
   }
@@ -139,7 +139,7 @@ class RequestTokens {
 
     const { username, recipient, operation, numOfTokens, songTitle } = this
     const mod = this.context['username']
-    // console.log({ mod, username, recipient, operation, numOfTokens, songTitle })
+    console.log({ mod, username, recipient, operation, numOfTokens, songTitle })
   }
 
   async runMessageCommand () {
@@ -150,12 +150,12 @@ class RequestTokens {
     //  - !token :: check tokens for this user
     if (this.chatMsg === '!token' || this.chatMsg === '!tokens') {
       await this.tokenCheck(this.context['username'])
-    } 
+    }
 
     //  - !token rules :: says the rules
     else if (this.chatMsg.replace(' ', '').includes('!tokenrules') || this.chatMsg.replace(' ', '').includes('!tokensrules')) {
       this.client.say(this.target, `A live learn (costs 5 tokens) is having donated $15, 1500 bits, or 5 gift subs to the channel. A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel.`);
-    } 
+    }
 
     else {
       anyoneCmdFound = false
@@ -195,37 +195,46 @@ class RequestTokens {
 
     // - !token (take|sub|subtract|remove|rm|ll|llearn|livelearn|bump|songbump) {@user} {# of tokens} {"Song Title"} :: subtract tokens from user, optionally save the song title
     else if (
-      (((this.operation === 'take' || 
-      this.operation === 'sub' || 
-      this.operation === 'subtract' || 
-      this.operation === 'remove' || 
-      this.operation === 'rm') && this.numOfTokens) || 
-      (this.operation === 'll' || 
-      this.operation === 'llearn' || 
-      this.operation === 'livelearn' || 
-      this.operation === 'bump' || 
-      this.operation === 'songbump')) 
+      (((this.operation === 'take' ||
+      this.operation === 'sub' ||
+      this.operation === 'subtract' ||
+      this.operation === 'remove' ||
+      this.operation === 'rm') && this.numOfTokens) ||
+      (this.operation === 'll' ||
+      this.operation === 'llearn' ||
+      this.operation === 'livelearn' ||
+      this.operation === 'bump' ||
+      this.operation === 'songbump'))
       && this.username) {
         await this.tokenSubtract()
     }
 
-    // - !token (transfer/move) {@user} {@recipient} {# of tokens} 
+    // - !token (transfer/move) {@user} {@recipient} {# of tokens}
     else if ((this.operation.includes('transfer') || this.operation.includes('move')) && this.username && this.recipient && this.numOfTokens) {
       await this.tokenTransfer()
     }
 
     // - !token clear {@user} :: set user tokens to zero, clear history using is_cleared flag
-    else if (this.operation === 'clear' && this.username) {
+    else if (this.operation === 'clear') {
+      if (!this.username) {
+        this.username = this.context['username']
+      }
       await this.tokenClear()
     }
 
     //  - !token history {@user}
-    else if (this.operation === 'history' && this.username) {
+    else if (this.operation === 'history') {
+      if (!this.username) {
+        this.username = this.context['username']
+      }
       await this.tokenHistory()
     }
 
     //  - !token (modhistory|mod history) {@mod}
-    else if (this.operation === 'modhistory' && this.username) {
+    else if (this.operation === 'modhistory') {
+      if (!this.username) {
+        this.username = this.context['username']
+      }
       await this.tokenModHistory()
     }
 
@@ -247,7 +256,7 @@ class RequestTokens {
 
   async tokenCheck (username) {
     const result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, this.channel)
-        
+
     if (result) {
       this.client.say(this.target, `@${username} has ${result.tokens} token(s) left`);
     } else {
@@ -259,7 +268,7 @@ class RequestTokens {
     if (this.numOfTokens > MAX_GIVE_TOKENS) this.numOfTokens = MAX_GIVE_TOKENS
 
     let result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
-    
+
     // insert or update
     if (!result) {
       await this.db.run(
@@ -270,7 +279,7 @@ class RequestTokens {
       await this.db.run(
         'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
         result.tokens + this.numOfTokens, Math.floor(new Date() / 1000), isAuto ? this.username : this.context['username'], this.username, this.channel
-      )          
+      )
     }
 
     // add to history
@@ -282,9 +291,9 @@ class RequestTokens {
     // speak to us
     result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
     if (isAuto) {
-      this.client.say(this.target, `@${this.username} got ${this.numOfTokens} token(s). They now have ${result.tokens} token(s).`);  
+      this.client.say(this.target, `@${this.username} got ${this.numOfTokens} token(s). They now have ${result.tokens} token(s).`);
     } else {
-      this.client.say(this.target, `Mod<${this.context['username']}> adds ${this.numOfTokens} token(s) to @${this.username}. They now have ${result.tokens} token(s).`);  
+      this.client.say(this.target, `Mod<${this.context['username']}> adds ${this.numOfTokens} token(s) to @${this.username}. They now have ${result.tokens} token(s).`);
     }
   }
 
@@ -296,13 +305,13 @@ class RequestTokens {
     }
 
     let result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
-    
+
     if (!result || result.tokens - this.numOfTokens < 0) {
       const userTokens = result ? result.tokens : 0
       this.client.say(this.target, `@${this.username} only has ${userTokens} token(s), so it's a no go!`)
       console.log(`* Executed ${this.chatMsg} command`);
       return
-    } 
+    }
 
     await this.db.run(
       'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
@@ -317,14 +326,14 @@ class RequestTokens {
 
     // speak to us
     result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
-    this.client.say(this.target, `Mod<${this.context['username']}> subtracts ${this.numOfTokens} token(s) from @${this.username}${this.songTitle ? ' for ' + this.songTitle : ''}${this.numOfTokens === BUMP_TOKEN ? ' (song bump)' : this.numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} token(s).`);  
+    this.client.say(this.target, `Mod<${this.context['username']}> subtracts ${this.numOfTokens} token(s) from @${this.username}${this.songTitle ? ' for ' + this.songTitle : ''}${this.numOfTokens === BUMP_TOKEN ? ' (song bump)' : this.numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} token(s).`);
   }
 
   async tokenTransfer () {
     if (this.numOfTokens > MAX_GIVE_TOKENS) this.numOfTokens = MAX_GIVE_TOKENS
 
     let usernameResult = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
-    
+
     if (!usernameResult || usernameResult.tokens - this.numOfTokens < 0) {
       const userTokens = usernameResult ? usernameResult.tokens : 0
       this.client.say(this.target, `@${this.username} only has ${userTokens} token(s), so it's a no go!`)
@@ -349,7 +358,7 @@ class RequestTokens {
       await this.db.run(
         'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
         recipientResult.tokens + this.numOfTokens, Math.floor(new Date() / 1000), this.context['username'], this.recipient, this.channel
-      )          
+      )
     }
 
     // add to history
@@ -364,19 +373,19 @@ class RequestTokens {
 
     // speak to us
     recipientResult = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.recipient, this.channel)
-    this.client.say(this.target, `Mod<${this.context['username']}> transfers ${this.numOfTokens} token(s) from @${this.username} to @${this.recipient}. @${this.username} has ${usernameResult.tokens - this.numOfTokens} token(s). @${this.recipient} has ${recipientResult.tokens} token(s).`);  
+    this.client.say(this.target, `Mod<${this.context['username']}> transfers ${this.numOfTokens} token(s) from @${this.username} to @${this.recipient}. @${this.username} has ${usernameResult.tokens - this.numOfTokens} token(s). @${this.recipient} has ${recipientResult.tokens} token(s).`);
   }
 
   async tokenClear () {
     await this.db.run(
       'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
       0, Math.floor(new Date() / 1000), this.context['username'], this.username, this.channel
-    )  
+    )
     await this.db.run(
       'UPDATE request_token_history SET is_cleared = 1 WHERE username = ? and channel = ?',
       this.username
     )
-    this.client.say(this.target, `@${this.username}'s tokens have been cleared`);  
+    this.client.say(this.target, `@${this.username}'s tokens have been cleared`);
   }
 
   async tokenHistory () {

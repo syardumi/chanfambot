@@ -13,7 +13,7 @@ open({
   driver: sqlite3.cached.Database
 }).then((db) => {
   // Called every time a message comes in
-  function onMessageHandler (target, context, msg, self) {
+  async function onMessageHandler (target, context, msg, self) {
     if (self) return // Ignore messages from the bot
     if (context["message-type"] !== 'chat') return // ignore messages that are not chat type
 
@@ -23,13 +23,13 @@ open({
     // console.log(context)
 
     if (config.modules.requestTokens) {
-      rt.onMessage(target, context, chatMsg)
+      await rt.onMessage(target, context, chatMsg)
     }
 
     if (config.modules.watermelons) {
       Watermelons(target, context, chatMsg, client)
     }
-    
+
     if (config.modules.songs) {
       Songs(target, context, chatMsg, client)
     }
