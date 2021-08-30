@@ -30,7 +30,7 @@ class RequestTokens {
   async onSub (target, username, numOfSubs) {
     this.init()
 
-    this.username = username
+    this.username = username.toLowerCase()
     this.operation = 'add'
     this.numOfTokens = numOfSubs
 
@@ -50,7 +50,7 @@ class RequestTokens {
   async onBits (target, username, numOfBits) {
     this.init()
 
-    this.username = username
+    this.username = username.toLowerCase()
     this.operation = 'add'
 
     this.target = target
@@ -136,6 +136,9 @@ class RequestTokens {
     })
     if (!this.operation) this.operation = 'check'
     if (this.songTitle) this.songTitle = this.songTitle.trim()
+    if (this.operation) this.operation = this.operation.toLowerCase()
+    if (this.username) this.username = this.username.toLowerCase()
+    if (this.recipient) this.recipient = this.recipient.toLowerCase()
 
     const { username, recipient, operation, numOfTokens, songTitle } = this
     const mod = this.context['username']
