@@ -40,38 +40,36 @@ open({
   }
 
   function onSubHandler (target, username, methods, msg, tags) {
-    // console.log(target)
     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onReSubHandler (target, username, streakMonths, msg, tags, methods) {
-    // console.log(target)
     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onSubGiftHandler (target, username, streakMonths, recipient, methods, tags) {
-    // console.log(target)
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+    console.log('Sub Gift', {target, username})
+//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onSubMysteryHandler (target, username, giftSubCount, methods, tags) {
-    // console.log(target)
-    if (config.modules.requestTokens) rt.onSub(target, username, giftSubCount)
+    console.log('Sub Mystery', {target, username, giftSubCount})
+//     if (config.modules.requestTokens) rt.onSub(target, username, giftSubCount)
   }
 
   function onPrimeUpgradeHandler (target, username, methods, tags) {
-    // console.log(target)
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+    console.log('Prime Upgrade', {target, username})
+//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onGiftUpgradeHandler (target, username, sender, tags) {
-    // console.log(target)
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+    console.log('Gift Upgrade', {target, username})
+//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onAnonGiftUpgradeHandler (target, username, tags) {
-    // console.log(target)
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+    console.log('Anon Gift upgrade', {target, username})
+//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onRawMsgHandler(msg) {
