@@ -28,6 +28,7 @@ class RequestTokens {
   // **************************
 
   async onSub (target, username, numOfSubs) {
+    console.log({ target, username, numOfSubs })
     this.init()
 
     this.username = username.toLowerCase()
@@ -48,6 +49,7 @@ class RequestTokens {
   // ***************************
 
   async onBits (target, username, numOfBits) {
+    console.log({ target, username, numOfBits})
     this.init()
 
     this.username = username.toLowerCase()
