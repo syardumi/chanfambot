@@ -159,7 +159,7 @@ class RequestTokens {
 
     //  - !token rules :: says the rules
     else if (this.chatMsg.replace(' ', '').includes('!tokenrules') || this.chatMsg.replace(' ', '').includes('!tokensrules')) {
-      this.client.say(this.target, `A live learn (costs 5 tokens) is having donated $15, 1500 bits, or 5 gift subs to the channel. A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel.`);
+      this.client.say(this.target, `An English live learn (costs 5 tokens) is having donated $15, 1500 bits, or 5 gift subs to the channel. A Spanish/Rap/Piano live learn (costs 10 tokens) is having donated $25, 2500 bits, or 10 gift subs to the channel. A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel.`);
     }
 
     else {
