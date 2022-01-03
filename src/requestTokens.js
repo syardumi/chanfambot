@@ -2,10 +2,17 @@ const LIVE_LEARN_TOKEN = 5 // TODO: change this to a channel setting
 const BUMP_TOKEN = 1 // TODO: change this to a channel setting
 const MAX_GIVE_TOKENS = 100
 
+const TOKENS_FROM_BITS_5 = 2500
+const TOKENS_FROM_BITS_3 = 1500
+const TOKENS_FROM_BITS_1 = 500
+
+const MILLISECONDS_IN_A_SECOND = 1000
+
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// TODO: auto add tokens from gift subs
 // TODO: auto add tokens via donations
 
 class RequestTokens {
@@ -58,21 +65,21 @@ class RequestTokens {
     this.target = target
     this.channel = target.substring(1, target.length)
 
-    if (numOfBits >= 500) {
+    if (numOfBits >= TOKENS_FROM_BITS_1) {
       this.numOfTokens = 0
       let remainder = numOfBits
 
-      if (remainder >= 1500) {
-        for (let i = remainder; i >= 1500; i -= 1500) {
+      if (remainder >= TOKENS_FROM_BITS_5) {
+        for (let i = remainder; i >= TOKENS_FROM_BITS_5; i -= TOKENS_FROM_BITS_5) {
           this.numOfTokens += 5
-          remainder -= 1500
+          remainder -= TOKENS_FROM_BITS_5
         }
       }
-      if (remainder >= 1000) {
+      if (remainder >= TOKENS_FROM_BITS_3) {
         this.numOfTokens += 3
-        remainder -= 1000
+        remainder -= TOKENS_FROM_BITS_3
       }
-      if (remainder >= 500) {
+      if (remainder >= TOKENS_FROM_BITS_1) {
         this.numOfTokens += 1
       }
 
@@ -80,7 +87,6 @@ class RequestTokens {
     }
 
     // console.log(`Bits - ${username} ${numOfBits}`)
-    // 500 bits = 1 token, 1000 bits = 3 tokens, 1500 bits = 5 tokens
   }
 
   // **************************
@@ -159,7 +165,7 @@ class RequestTokens {
 
     //  - !token rules :: says the rules
     else if (this.chatMsg.replace(' ', '').includes('!tokenrules') || this.chatMsg.replace(' ', '').includes('!tokensrules')) {
-      this.client.say(this.target, `A live learn (costs 5 tokens) is having donated $15, 1500 bits, or 5 gift subs to the channel. A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel.`);
+      this.client.say(this.target, `A regular live learn (costs 5 tokens) is having donated $25, 2500 bits, or 5 gift subs to the channel. A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel. Special and Spanish live learns cost 10 tokens.`);
     }
 
     else {
@@ -278,19 +284,19 @@ class RequestTokens {
     if (!result) {
       await this.db.run(
         'INSERT INTO request_token (channel, username, tokens, updated_at, updated_by) VALUES (?, ?, ?, ?, ?)',
-        this.channel, this.username, this.numOfTokens, Math.floor(new Date() / 1000), isAuto ? this.username : this.context['username']
+        this.channel, this.username, this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), isAuto ? this.username : this.context['username']
       )
     } else {
       await this.db.run(
         'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
-        result.tokens + this.numOfTokens, Math.floor(new Date() / 1000), isAuto ? this.username : this.context['username'], this.username, this.channel
+        result.tokens + this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), isAuto ? this.username : this.context['username'], this.username, this.channel
       )
     }
 
     // add to history
     await this.db.run(
       'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      this.channel, this.username, isAuto ? this.username : this.context['username'], 'add', this.numOfTokens, this.songTitle, Math.floor(new Date() / 1000)
+      this.channel, this.username, isAuto ? this.username : this.context['username'], 'add', this.numOfTokens, this.songTitle, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
     )
 
     // speak to us
@@ -320,13 +326,13 @@ class RequestTokens {
 
     await this.db.run(
       'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
-      result.tokens - this.numOfTokens, Math.floor(new Date() / 1000), this.context['username'], this.username, this.channel
+      result.tokens - this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), this.context['username'], this.username, this.channel
     )
 
     // add to history
     await this.db.run(
       'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      this.channel, this.username, this.context['username'], 'subtract', this.numOfTokens, this.songTitle, Math.floor(new Date() / 1000)
+      this.channel, this.username, this.context['username'], 'subtract', this.numOfTokens, this.songTitle, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
     )
 
     // speak to us
@@ -348,7 +354,7 @@ class RequestTokens {
 
     await this.db.run(
       'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
-      usernameResult.tokens - this.numOfTokens, Math.floor(new Date() / 1000), this.context['username'], this.username, this.channel
+      usernameResult.tokens - this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), this.context['username'], this.username, this.channel
     )
 
     let recipientResult = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.recipient, this.channel)
@@ -357,23 +363,23 @@ class RequestTokens {
     if (!recipientResult) {
       await this.db.run(
         'INSERT INTO request_token (channel, username, tokens, updated_at, updated_by) VALUES (?, ?, ?, ?, ?)',
-        this.channel, this.recipient, this.numOfTokens, Math.floor(new Date() / 1000), this.context['username']
+        this.channel, this.recipient, this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), this.context['username']
       )
     } else {
       await this.db.run(
         'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
-        recipientResult.tokens + this.numOfTokens, Math.floor(new Date() / 1000), this.context['username'], this.recipient, this.channel
+        recipientResult.tokens + this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), this.context['username'], this.recipient, this.channel
       )
     }
 
     // add to history
     await this.db.run(
       'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-      this.channel, this.recipient, this.context['username'], 'add', this.numOfTokens, Math.floor(new Date() / 1000)
+      this.channel, this.recipient, this.context['username'], 'add', this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
     )
     await this.db.run(
       'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-      this.channel, this.username, this.context['username'], 'subtract', this.numOfTokens, Math.floor(new Date() / 1000)
+      this.channel, this.username, this.context['username'], 'subtract', this.numOfTokens, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
     )
 
     // speak to us
@@ -384,7 +390,7 @@ class RequestTokens {
   async tokenClear () {
     await this.db.run(
       'UPDATE request_token SET tokens = ?, updated_at = ?, updated_by = ? WHERE username = ? AND channel = ?',
-      0, Math.floor(new Date() / 1000), this.context['username'], this.username, this.channel
+      0, Math.floor(new Date() / MILLISECONDS_IN_A_SECOND), this.context['username'], this.username, this.channel
     )
     await this.db.run(
       'UPDATE request_token_history SET is_cleared = 1 WHERE username = ? and channel = ?',
