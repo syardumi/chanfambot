@@ -17,9 +17,10 @@ function isNumeric(n) {
 
 class RequestTokens {
 
-  constructor(client, db) {
+  constructor(client, db, config) {
     this.client = client
     this.db = db
+    this.config = config
   }
 
   init () {
@@ -44,6 +45,7 @@ class RequestTokens {
 
     this.target = target
     this.channel = target.substring(1, target.length)
+    this.tokenIcon = this.config.tokenIcons[this.channel] || ''
 
     await this.tokenAdd(true)
 
@@ -64,6 +66,7 @@ class RequestTokens {
 
     this.target = target
     this.channel = target.substring(1, target.length)
+    this.tokenIcon = this.config.tokenIcons[this.channel] || ''
 
     if (numOfBits >= TOKENS_FROM_BITS_1) {
       this.numOfTokens = 0
@@ -102,6 +105,7 @@ class RequestTokens {
 
       this.target = target
       this.channel = target.substring(1, target.length)
+      this.tokenIcon = this.config.tokenIcons[this.channel] || ''
       this.isSuperUser = (this.context['badges'] && this.context['badges']['broadcaster'] === '1') || this.context['mod'] === true || this.context['username'] === 'thefinaledge'
 
       if (!this.chatMsg.includes('!token')) return
@@ -165,7 +169,7 @@ class RequestTokens {
 
     //  - !token rules :: says the rules
     else if (this.chatMsg.replace(' ', '').includes('!tokenrules') || this.chatMsg.replace(' ', '').includes('!tokensrules')) {
-      this.client.say(this.target, `A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel. An English live learn (costs 5 tokens) is having donated $25, 2500 bits, or 5 gift subs to the channel. A Spanish/Rap/Piano live learn (costs 10 tokens) is having donated $50, 5000 bits, or 10 gift subs to the channel.`);
+      this.client.say(this.target, `${this.tokenIcon} A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel. An English live learn (costs 5 tokens) is having donated $25, 2500 bits, or 5 gift subs to the channel. A Spanish/Rap/Piano live learn (costs 10 tokens) is having donated $50, 5000 bits, or 10 gift subs to the channel. ${this.tokenIcon}`);
     }
 
     else {
@@ -269,9 +273,9 @@ class RequestTokens {
     const result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', username, this.channel)
 
     if (result) {
-      this.client.say(this.target, `@${username} has ${result.tokens} token(s) left`);
+      this.client.say(this.target, `@${username} has ${result.tokens} ${this.tokenIcon} token(s) left`);
     } else {
-      this.client.say(this.target, `@${username} has no tokens right now`);
+      this.client.say(this.target, `@${username} has no ${this.tokenIcon} tokens right now`);
     }
   }
 
@@ -302,9 +306,9 @@ class RequestTokens {
     // speak to us
     result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
     if (isAuto) {
-      this.client.say(this.target, `@${this.username} got ${this.numOfTokens} token(s). They now have ${result.tokens} token(s).`);
+      this.client.say(this.target, `@${this.username} got ${this.numOfTokens} ${this.tokenIcon} token(s). They now have ${result.tokens} token(s).`);
     } else {
-      this.client.say(this.target, `Mod<${this.context['username']}> adds ${this.numOfTokens} token(s) to @${this.username}. They now have ${result.tokens} token(s).`);
+      this.client.say(this.target, `Mod<${this.context['username']}> adds ${this.numOfTokens} ${this.tokenIcon} token(s) to @${this.username}. They now have ${result.tokens} ${this.tokenIcon} token(s).`);
     }
   }
 
@@ -319,7 +323,7 @@ class RequestTokens {
 
     if (!result || result.tokens - this.numOfTokens < 0) {
       const userTokens = result ? result.tokens : 0
-      this.client.say(this.target, `@${this.username} only has ${userTokens} token(s), so it's a no go!`)
+      this.client.say(this.target, `@${this.username} only has ${userTokens} ${this.tokenIcon} token(s), so it's a no go!`)
       console.log(`* Executed ${this.chatMsg} command`);
       return
     }
@@ -337,7 +341,7 @@ class RequestTokens {
 
     // speak to us
     result = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.username, this.channel)
-    this.client.say(this.target, `Mod<${this.context['username']}> subtracts ${this.numOfTokens} token(s) from @${this.username}${this.songTitle ? ' for ' + this.songTitle : ''}${this.numOfTokens === BUMP_TOKEN ? ' (song bump)' : this.numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} token(s).`);
+    this.client.say(this.target, `Mod<${this.context['username']}> subtracts ${this.numOfTokens} ${this.tokenIcon} token(s) from @${this.username}${this.songTitle ? ' for ' + this.songTitle : ''}${this.numOfTokens === BUMP_TOKEN ? ' (song bump)' : this.numOfTokens === LIVE_LEARN_TOKEN ? ' (live learn)' : ''}. They now have ${result.tokens} ${this.tokenIcon} token(s).`);
   }
 
   async tokenTransfer () {
@@ -347,7 +351,7 @@ class RequestTokens {
 
     if (!usernameResult || usernameResult.tokens - this.numOfTokens < 0) {
       const userTokens = usernameResult ? usernameResult.tokens : 0
-      this.client.say(this.target, `@${this.username} only has ${userTokens} token(s), so it's a no go!`)
+      this.client.say(this.target, `@${this.username} only has ${userTokens} ${this.tokenIcon} token(s), so it's a no go!`)
       console.log(`* Executed ${this.chatMsg} command`);
       return
     }
@@ -384,7 +388,7 @@ class RequestTokens {
 
     // speak to us
     recipientResult = await this.db.get('SELECT tokens FROM request_token WHERE username = ? AND channel = ?', this.recipient, this.channel)
-    this.client.say(this.target, `Mod<${this.context['username']}> transfers ${this.numOfTokens} token(s) from @${this.username} to @${this.recipient}. @${this.username} has ${usernameResult.tokens - this.numOfTokens} token(s). @${this.recipient} has ${recipientResult.tokens} token(s).`);
+    this.client.say(this.target, `Mod<${this.context['username']}> transfers ${this.numOfTokens} ${this.tokenIcon} token(s) from @${this.username} to @${this.recipient}. @${this.username} has ${usernameResult.tokens - this.numOfTokens} ${this.tokenIcon} token(s). @${this.recipient} has ${recipientResult.tokens} ${this.tokenIcon} token(s).`);
   }
 
   async tokenClear () {

@@ -103,7 +103,7 @@ open({
     },
     channels: config.channels
   });
-  const rt = new RequestTokens(client, db)
+  const rt = new RequestTokens(client, db, config)
 
   // // Register our event handlers (defined below)
   client.on('raw_message', onRawMsgHandler)
