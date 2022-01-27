@@ -67,24 +67,25 @@ class RequestTokens {
     this.target = target
     this.channel = target.substring(1, target.length)
     this.tokenIcon = this.config.tokenIcons[this.channel] || ''
-
+    
     if (numOfBits >= TOKENS_FROM_BITS_1) {
-      this.numOfTokens = 0
-      let remainder = numOfBits
+      this.numOfTokens = Math.floor(numOfBits / TOKENS_FROM_BITS_1)
+      
+//       let remainder = numOfBits
 
-      if (remainder >= TOKENS_FROM_BITS_5) {
-        for (let i = remainder; i >= TOKENS_FROM_BITS_5; i -= TOKENS_FROM_BITS_5) {
-          this.numOfTokens += 5
-          remainder -= TOKENS_FROM_BITS_5
-        }
-      }
-      if (remainder >= TOKENS_FROM_BITS_3) {
-        this.numOfTokens += 3
-        remainder -= TOKENS_FROM_BITS_3
-      }
-      if (remainder >= TOKENS_FROM_BITS_1) {
-        this.numOfTokens += 1
-      }
+//       if (remainder >= TOKENS_FROM_BITS_5) {
+//         for (let i = remainder; i >= TOKENS_FROM_BITS_5; i -= TOKENS_FROM_BITS_5) {
+//           this.numOfTokens += 5
+//           remainder -= TOKENS_FROM_BITS_5
+//         }
+//       }
+//       if (remainder >= TOKENS_FROM_BITS_3) {
+//         this.numOfTokens += 3
+//         remainder -= TOKENS_FROM_BITS_3
+//       }
+//       if (remainder >= TOKENS_FROM_BITS_1) {
+//         this.numOfTokens += 1
+//       }
 
       await this.tokenAdd(true)
     }
