@@ -1,10 +1,10 @@
-const Watermelons = require('./watermelons');
+const Watermelons = require('./watermelons')
 const Songs = require('./songs')
 const AmongUs = require('./amongUs')
 const RequestTokens = require('./requestTokens')
 const config = require('./.env.js')
 
-const tmi = require('tmi.js');
+const tmi = require('tmi.js')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
@@ -13,12 +13,12 @@ open({
   driver: sqlite3.cached.Database
 }).then((db) => {
   // Called every time a message comes in
-  async function onMessageHandler (target, context, msg, self) {
+  async function onMessageHandler(target, context, msg, self) {
     if (self) return // Ignore messages from the bot
-    if (context["message-type"] !== 'chat') return // ignore messages that are not chat type
+    if (context['message-type'] !== 'chat') return // ignore messages that are not chat type
 
     // Remove whitespace from edges of chat message
-    const chatMsg = msg.trim().toLowerCase();
+    const chatMsg = msg.trim().toLowerCase()
 
     // console.log(context)
 
@@ -39,37 +39,54 @@ open({
     }
   }
 
-  function onSubHandler (target, username, methods, msg, tags) {
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onSubHandler(target, username, methods, msg, tags) {
+    if (config.modules.requestTokens)
+      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
   }
 
-  function onReSubHandler (target, username, streakMonths, msg, tags, methods) {
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onReSubHandler(target, username, streakMonths, msg, tags, methods) {
+    if (config.modules.requestTokens)
+      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
   }
 
-  function onSubGiftHandler (target, username, streakMonths, recipient, methods, tags) {
-    console.log('Sub Gift', {target, username})
-//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onSubGiftHandler(
+    target,
+    username,
+    streakMonths,
+    recipient,
+    methods,
+    tags
+  ) {
+    // console.log('Sub Gift', {target, username})
+    if (config.modules.requestTokens)
+      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
   }
 
-  function onSubMysteryHandler (target, username, giftSubCount, methods, tags) {
-    console.log('Sub Mystery', {target, username, giftSubCount})
-//     if (config.modules.requestTokens) rt.onSub(target, username, giftSubCount)
+  function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
+    // console.log('Sub Mystery', {target, username, giftSubCount})
+    if (config.modules.requestTokens)
+      rt.onSub(
+        target,
+        username,
+        giftSubCount,
+        tags['msg-param-origin-id'],
+        true
+      )
   }
 
-  function onPrimeUpgradeHandler (target, username, methods, tags) {
-    console.log('Prime Upgrade', {target, username})
-//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onPrimeUpgradeHandler(target, username, methods, tags) {
+    console.log('Prime Upgrade', { target, username })
+    //     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
-  function onGiftUpgradeHandler (target, username, sender, tags) {
-    console.log('Gift Upgrade', {target, username})
-//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onGiftUpgradeHandler(target, username, sender, tags) {
+    console.log('Gift Upgrade', { target, username })
+    //     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
-  function onAnonGiftUpgradeHandler (target, username, tags) {
-    console.log('Anon Gift upgrade', {target, username})
-//     if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  function onAnonGiftUpgradeHandler(target, username, tags) {
+    console.log('Anon Gift upgrade', { target, username })
+    //     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onRawMsgHandler(msg) {
@@ -80,12 +97,13 @@ open({
         target = param
       }
     })
-    if (bits && config.modules.requestTokens) rt.onBits(target, msg.tags['display-name'], bits)
+    if (bits && config.modules.requestTokens)
+      rt.onBits(target, msg.tags['display-name'], bits)
   }
 
   // Called every time the bot connects to Twitch chat
-  function onConnectedHandler (addr, port) {
-    console.log(`* Connected to ${addr}:${port}`);
+  function onConnectedHandler(addr, port) {
+    console.log(`* Connected to ${addr}:${port}`)
   }
 
   // Create a client with our options
@@ -94,20 +112,20 @@ open({
       debug: false
     },
     connection: {
-        reconnect: true,
-        secure: true
+      reconnect: true,
+      secure: true
     },
     identity: {
       username: config.oauthUsername,
       password: config.oauthPassword
     },
     channels: config.channels
-  });
+  })
   const rt = new RequestTokens(client, db, config)
 
   // // Register our event handlers (defined below)
   client.on('raw_message', onRawMsgHandler)
-  client.on('message', onMessageHandler);
+  client.on('message', onMessageHandler)
 
   client.on('sub', onSubHandler)
   client.on('resub', onReSubHandler)
@@ -117,8 +135,8 @@ open({
   client.on('giftpaidupgrade', onGiftUpgradeHandler)
   client.on('anongiftpaidupgrade', onAnonGiftUpgradeHandler)
 
-  client.on('connected', onConnectedHandler);
+  client.on('connected', onConnectedHandler)
 
   // // Connect to Twitch:
-  client.connect();
+  client.connect()
 })
