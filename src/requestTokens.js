@@ -67,7 +67,7 @@ class RequestTokens {
       )
     } else {
       if (result && result.mystery_sub_buffer_count > 0) {
-        bufferCount = result.mystery_sub_buffer_count - 1
+        let bufferCount = result.mystery_sub_buffer_count - 1
         if (bufferCount < 0) {
           bufferCount = 0
         }
