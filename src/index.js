@@ -40,13 +40,11 @@ open({
   }
 
   function onSubHandler(target, username, methods, msg, tags) {
-    if (config.modules.requestTokens)
-      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onReSubHandler(target, username, streakMonths, msg, tags, methods) {
-    if (config.modules.requestTokens)
-      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onSubGiftHandler(
@@ -58,20 +56,13 @@ open({
     tags
   ) {
     // console.log('Sub Gift', {target, username})
-    if (config.modules.requestTokens)
-      rt.onSub(target, username, 1, tags['msg-param-origin-id'])
+    if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
   function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
     // console.log('Sub Mystery', {target, username, giftSubCount})
     if (config.modules.requestTokens)
-      rt.onSub(
-        target,
-        username,
-        giftSubCount,
-        tags['msg-param-origin-id'],
-        true
-      )
+      rt.onSub(target, username, giftSubCount, true)
   }
 
   function onPrimeUpgradeHandler(target, username, methods, tags) {

@@ -34,8 +34,8 @@ class RequestTokens {
   // ****** SUB RECEIVED ******
   // **************************
 
-  async onSub(target, username, numOfSubs, messageId, isMystery) {
-    console.log({ target, username, numOfSubs, messageId, isMystery })
+  async onSub(target, username, numOfSubs, isMystery) {
+    console.log({ target, username, numOfSubs, isMystery })
     this.init()
 
     this.username = username.toLowerCase()
@@ -46,24 +46,41 @@ class RequestTokens {
     this.channel = target.substring(1, target.length)
     this.tokenIcon = this.config.tokenIcons[this.channel] || ''
 
+    const result = await this.db.get(
+      'SELECT mystery_sub_buffer_count FROM request_token WHERE username = ? AND channel = ?',
+      username,
+      this.channel
+    )
     if (isMystery) {
+      let bufferCount = numOfSubs
+      if (result) {
+        bufferCount += result.mystery_sub_buffer_count
+      }
+
+      await this.tokenAdd(true)
+
       await this.db.run(
-        'UPDATE request_token SET last_multi_sub_hash = ? WHERE username = ? AND channel = ?',
-        messageId,
+        'UPDATE request_token SET mystery_sub_buffer_count = ? WHERE username = ? AND channel = ?',
+        bufferCount,
         this.username,
         this.channel
       )
     } else {
-      const result = await this.db.get(
-        'SELECT last_multi_sub_hash FROM request_token WHERE username = ? AND channel = ?',
-        username,
-        this.channel
-      )
-
-      if (result && result.last_multi_sub_hash === messageId) return
+      if (result && result.mystery_sub_buffer_count > 0) {
+        bufferCount = result.mystery_sub_buffer_count - 1
+        if (bufferCount < 0) {
+          bufferCount = 0
+        }
+        await this.db.run(
+          'UPDATE request_token SET mystery_sub_buffer_count = ? WHERE username = ? AND channel = ?',
+          bufferCount,
+          this.username,
+          this.channel
+        )
+      } else {
+        await this.tokenAdd(true)
+      }
     }
-
-    await this.tokenAdd(true)
 
     // console.log(`Subs - ${username} ${numOfSubs}`)
     // 1 sub = 1 token
