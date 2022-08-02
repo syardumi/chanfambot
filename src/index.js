@@ -60,7 +60,13 @@ open({
   }
 
   function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
-    console.log('Sub Mystery', { target, username, giftSubCount })
+    // console.log('Sub Mystery', { target, username, giftSubCount })
+    client.say(
+      target,
+      `@${username} got ${giftSubCount} ${
+        config.tokenIcons[target.substring(1, target.length)]
+      } token(s).`
+    )
     // if (config.modules.requestTokens)
     //   rt.onSub(target, username, giftSubCount, true)
   }
