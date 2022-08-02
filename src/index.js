@@ -60,9 +60,9 @@ open({
   }
 
   function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
-    // console.log('Sub Mystery', {target, username, giftSubCount})
-    if (config.modules.requestTokens)
-      rt.onSub(target, username, giftSubCount, true)
+    console.log('Sub Mystery', { target, username, giftSubCount })
+    // if (config.modules.requestTokens)
+    //   rt.onSub(target, username, giftSubCount, true)
   }
 
   function onPrimeUpgradeHandler(target, username, methods, tags) {
