@@ -44,7 +44,7 @@ class RequestTokens {
 
     this.target = target
     this.channel = target.substring(1, target.length)
-    this.tokenIcon = this.config.tokenIcons[this.channel] || ''
+    this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
 
     await this.tokenAdd(true)
 
@@ -65,7 +65,7 @@ class RequestTokens {
 
     this.target = target
     this.channel = target.substring(1, target.length)
-    this.tokenIcon = this.config.tokenIcons[this.channel] || ''
+    this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
 
     if (numOfBits >= TOKENS_FROM_BITS_1) {
       this.numOfTokens = Math.floor(numOfBits / TOKENS_FROM_BITS_1)
@@ -89,12 +89,12 @@ class RequestTokens {
 
       this.target = target
       this.channel = target.substring(1, target.length)
-      this.tokenIcon = this.config.tokenIcons[this.channel] || ''
+      this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
       this.isSuperUser =
         (this.context['badges'] &&
           this.context['badges']['broadcaster'] === '1') ||
         this.context['mod'] === true ||
-        this.context['username'] === 'thefinalbeannn'
+        this.context['username'] === this.config.me
 
       if (!this.chatMsg.includes('!token')) return
 

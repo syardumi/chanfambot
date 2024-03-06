@@ -9,12 +9,12 @@
   "author": "Steve Yardumian",
   "license": "MIT",
   "dependencies": {
-    "numeral": "2.0.6",
-    "sqlite": "4.0.23",
-    "sqlite3": "5.0.2",
-    "tmi.js": "1.8.3"
+    "numeral": "^2.0.6",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "tmi.js": "^1.8.5"
   },
   "devDependencies": {
-    "jest": "27.1.0"
+    "jest": "^29.7.0"
   }
 }

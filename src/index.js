@@ -64,7 +64,7 @@ open({
     client.say(
       target,
       `@${username} got ${giftSubCount} ${
-        config.tokenIcons[target.substring(1, target.length)]
+        config.tokenEmotes[target.substring(1, target.length)]
       } token(s).`
     )
     // if (config.modules.requestTokens)

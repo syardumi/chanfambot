@@ -5,12 +5,16 @@ const config = {
   channels: [
     'atwitchchannel'
   ],
+  tokenEmotes: {
+    atwitchchannel: 'thisEmote'
+  },
   modules: {
     amongUs: false,
     requestTokens: true,
     songs: true,
     watermelons: true
-  }
+  },
+  me: 'myusername'
 }
 
 module.exports = config
