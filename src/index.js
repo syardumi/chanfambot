@@ -8,6 +8,8 @@ const tmi = require('tmi.js')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
+const tokenSubTimeouts = []
+
 open({
   filename: config.dbLocation,
   driver: sqlite3.cached.Database
@@ -23,7 +25,9 @@ open({
     // console.log(context)
 
     if (config.modules.requestTokens) {
-      await rt.onMessage(target, context, chatMsg)
+      const rt = new RequestTokens({ config, client, db, target})
+      await rt.onMessage(context, chatMsg)
+      delete rt
     }
 
     if (config.modules.watermelons) {
@@ -39,15 +43,25 @@ open({
     }
   }
 
-  function onSubHandler(target, username, methods, msg, tags) {
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  async function onSubHandler(target, username, methods, msg, tags) {
+    if (config.modules.requestTokens) {
+      if (tokenSubTimeouts.includes(username)) return
+      const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: 1})
+      await rt.onSub()
+      delete rt
+    }
   }
 
-  function onReSubHandler(target, username, streakMonths, msg, tags, methods) {
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+  async function onReSubHandler(target, username, streakMonths, msg, tags, methods) {
+    if (config.modules.requestTokens) {
+      if (tokenSubTimeouts.includes(username)) return
+      const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: 1})
+      await rt.onSub()
+      delete rt
+    }
   }
 
-  function onSubGiftHandler(
+  async function onSubGiftHandler(
     target,
     username,
     streakMonths,
@@ -56,19 +70,38 @@ open({
     tags
   ) {
     // console.log('Sub Gift', {target, username})
-    if (config.modules.requestTokens) rt.onSub(target, username, 1)
+    if (config.modules.requestTokens) {
+      if (tokenSubTimeouts.includes(username)) return
+      const rt = new RequestTokens({ config, client, db, target, username, recipient, numOfSubs: 1})
+      await rt.onSub()
+      delete rt
+    }
   }
 
-  function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
+  async function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
     // console.log('Sub Mystery', { target, username, giftSubCount })
-    client.say(
-      target,
-      `@${username} got ${giftSubCount} ${
-        config.tokenEmotes[target.substring(1, target.length)]
-      } token(s).`
-    )
-    // if (config.modules.requestTokens)
-    //   rt.onSub(target, username, giftSubCount, true)
+    // client.say(
+    //   target,
+    //   `@${username} got ${giftSubCount} ${
+    //     config.tokenEmotes[target.substring(1, target.length)]
+    //   } token(s).`
+    // )
+    if (config.modules.requestTokens) {
+      if (tokenSubTimeouts.includes(username)) return
+      if (giftSubCount > 1 && !tokenSubTimeouts.includes(username)) {
+        tokenSubTimeouts.push(username)
+        setTimeout(() => {
+          const index = tokenSubTimeouts.indexOf(username);
+          if (index > -1) { 
+            tokenSubTimeouts.splice(index, 1); 
+          }
+        }, 10e3)
+      }
+
+      const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: giftSubCount})
+      await rt.onSub()
+      delete rt
+    }
   }
 
   function onPrimeUpgradeHandler(target, username, methods, tags) {
@@ -86,7 +119,7 @@ open({
     //     if (config.modules.requestTokens) rt.onSub(target, username, 1)
   }
 
-  function onRawMsgHandler(msg) {
+  async function onRawMsgHandler(msg) {
     const bits = parseInt(msg.tags.bits)
     let target
     msg.params.forEach((param) => {
@@ -94,8 +127,11 @@ open({
         target = param
       }
     })
-    if (bits && config.modules.requestTokens)
-      rt.onBits(target, msg.tags['display-name'], bits)
+    if (config.modules.requestTokens && bits) {
+      const rt = new RequestTokens({ config, client, db, target, username: msg.tags['display-name']})
+      await rt.onBits(bits)
+      delete rt
+    }
   }
 
   // Called every time the bot connects to Twitch chat
@@ -118,8 +154,7 @@ open({
     },
     channels: config.channels
   })
-  const rt = new RequestTokens(client, db, config)
-
+  
   // // Register our event handlers (defined below)
   client.on('raw_message', onRawMsgHandler)
   client.on('message', onMessageHandler)

@@ -16,36 +16,25 @@ function isNumeric(n) {
 // TODO: auto add tokens via donations
 
 class RequestTokens {
-  constructor(client, db, config) {
+  constructor({client, db, config, target, username, recipient, numOfSubs, songTitle}) {
     this.client = client
     this.db = db
     this.config = config
-  }
 
-  init() {
-    this.username = undefined
-    this.recipient = undefined
-    this.operation = undefined
-    this.numOfTokens = undefined
-    this.songTitle = null
+    this.target = target
+    this.channel = target.substring(1, target.length)
+    this.username = username.toLowerCase()
+    this.recipient = recipient
+    this.numOfTokens = numOfSubs
+    this.songTitle = songTitle
+    this.tokenEmote = this.config.tokenEmotes[this.channel] || ''
   }
 
   // **************************
   // ****** SUB RECEIVED ******
   // **************************
 
-  async onSub(target, username, numOfSubs, isMystery) {
-    console.log({ target, username, numOfSubs, isMystery })
-    this.init()
-
-    this.username = username.toLowerCase()
-    this.operation = 'add'
-    this.numOfTokens = numOfSubs
-
-    this.target = target
-    this.channel = target.substring(1, target.length)
-    this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
-
+  async onSub() {
     await this.tokenAdd(true)
 
     // console.log(`Subs - ${username} ${numOfSubs}`)
@@ -56,16 +45,8 @@ class RequestTokens {
   // ****** BITS RECEIVED ******
   // ***************************
 
-  async onBits(target, username, numOfBits) {
-    console.log({ target, username, numOfBits })
-    this.init()
-
-    this.username = username.toLowerCase()
-    this.operation = 'add'
-
-    this.target = target
-    this.channel = target.substring(1, target.length)
-    this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
+  async onBits(numOfBits) {
+    console.log({ numOfBits })
 
     if (numOfBits >= TOKENS_FROM_BITS_1) {
       this.numOfTokens = Math.floor(numOfBits / TOKENS_FROM_BITS_1)
@@ -80,16 +61,11 @@ class RequestTokens {
   // ****** MSG RECEIVED ******
   // **************************
 
-  onMessage(target, context, chatMsg) {
+  onMessage(context, chatMsg) {
     return (async () => {
-      this.init()
-
       this.context = context
       this.chatMsg = chatMsg
 
-      this.target = target
-      this.channel = target.substring(1, target.length)
-      this.tokenIcon = this.config.tokenEmotes[this.channel] || ''
       this.isSuperUser =
         (this.context['badges'] &&
           this.context['badges']['broadcaster'] === '1') ||
@@ -174,7 +150,7 @@ class RequestTokens {
     ) {
       this.client.say(
         this.target,
-        `${this.tokenIcon} A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel. An English live learn (costs 5 tokens) is having donated $25, 2500 bits, or 5 gift subs to the channel. A Spanish/Rap/Piano live learn (costs 10 tokens) is having donated $50, 5000 bits, or 10 gift subs to the channel. ${this.tokenIcon}`
+        `${this.tokenEmote} A song bump (costs 1 token) is having donated $5, 500 bits, or 1 gift sub to the channel. An English live learn (costs 5 tokens) is having donated $25, 2500 bits, or 5 gift subs to the channel. A Spanish/Rap/Piano live learn (costs 10 tokens) is having donated $50, 5000 bits, or 10 gift subs to the channel. ${this.tokenEmote}`
       )
     } else {
       anyoneCmdFound = false
@@ -316,12 +292,12 @@ class RequestTokens {
     if (result) {
       this.client.say(
         this.target,
-        `@${username} has ${result.tokens} ${this.tokenIcon} token(s) left`
+        `@${username} has ${result.tokens} ${this.tokenEmote} token(s) left`
       )
     } else {
       this.client.say(
         this.target,
-        `@${username} has no ${this.tokenIcon} tokens right now`
+        `@${username} has no ${this.tokenEmote} tokens right now`
       )
     }
   }
@@ -379,12 +355,12 @@ class RequestTokens {
       if (this.username && this.numOfTokens)
         this.client.say(
           this.target,
-          `@${this.username} got ${this.numOfTokens} ${this.tokenIcon} token(s). They now have ${result.tokens} token(s).`
+          `@${this.username} got ${this.numOfTokens} ${this.tokenEmote} token(s). They now have ${result.tokens} token(s).`
         )
     } else {
       this.client.say(
         this.target,
-        `Mod<${this.context['username']}> adds ${this.numOfTokens} ${this.tokenIcon} token(s) to @${this.username}. They now have ${result.tokens} ${this.tokenIcon} token(s).`
+        `Mod<${this.context['username']}> adds ${this.numOfTokens} ${this.tokenEmote} token(s) to @${this.username}. They now have ${result.tokens} ${this.tokenEmote} token(s).`
       )
     }
   }
@@ -410,7 +386,7 @@ class RequestTokens {
       const userTokens = result ? result.tokens : 0
       this.client.say(
         this.target,
-        `@${this.username} only has ${userTokens} ${this.tokenIcon} token(s), so it's a no go!`
+        `@${this.username} only has ${userTokens} ${this.tokenEmote} token(s), so it's a no go!`
       )
       console.log(`* Executed ${this.chatMsg} command`)
       return
@@ -447,7 +423,7 @@ class RequestTokens {
     this.client.say(
       this.target,
       `Mod<${this.context['username']}> subtracts ${this.numOfTokens} ${
-        this.tokenIcon
+        this.tokenEmote
       } token(s) from @${this.username}${
         this.songTitle ? ' for ' + this.songTitle : ''
       }${
@@ -456,7 +432,7 @@ class RequestTokens {
           : this.numOfTokens === LIVE_LEARN_TOKEN
           ? ' (live learn)'
           : ''
-      }. They now have ${result.tokens} ${this.tokenIcon} token(s).`
+      }. They now have ${result.tokens} ${this.tokenEmote} token(s).`
     )
   }
 
@@ -473,7 +449,7 @@ class RequestTokens {
       const userTokens = usernameResult ? usernameResult.tokens : 0
       this.client.say(
         this.target,
-        `@${this.username} only has ${userTokens} ${this.tokenIcon} token(s), so it's a no go!`
+        `@${this.username} only has ${userTokens} ${this.tokenEmote} token(s), so it's a no go!`
       )
       console.log(`* Executed ${this.chatMsg} command`)
       return
@@ -546,13 +522,13 @@ class RequestTokens {
     this.client.say(
       this.target,
       `Mod<${this.context['username']}> transfers ${this.numOfTokens} ${
-        this.tokenIcon
+        this.tokenEmote
       } token(s) from @${this.username} to @${this.recipient}. @${
         this.username
       } has ${usernameResult.tokens - this.numOfTokens} ${
-        this.tokenIcon
+        this.tokenEmote
       } token(s). @${this.recipient} has ${recipientResult.tokens} ${
-        this.tokenIcon
+        this.tokenEmote
       } token(s).`
     )
   }
