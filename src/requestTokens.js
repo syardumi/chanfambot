@@ -357,16 +357,17 @@ class RequestTokens {
     }
 
     // add to history
-    await this.db.run(
-      'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      this.channel,
-      this.username,
-      isAuto ? this.username : this.context['username'],
-      'add',
-      this.numOfTokens,
-      this.songTitle,
-      Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
-    )
+    if (this.channel && this.username && this.numOfTokens !== undefined)
+      await this.db.run(
+        'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        this.channel,
+        this.username,
+        isAuto ? this.username : this.context['username'],
+        'add',
+        this.numOfTokens,
+        this.songTitle,
+        Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
+      )
 
     // speak to us
     result = await this.db.get(
@@ -375,10 +376,11 @@ class RequestTokens {
       this.channel
     )
     if (isAuto) {
-      this.client.say(
-        this.target,
-        `@${this.username} got ${this.numOfTokens} ${this.tokenIcon} token(s). They now have ${result.tokens} token(s).`
-      )
+      if (this.username && this.numOfTokens)
+        this.client.say(
+          this.target,
+          `@${this.username} got ${this.numOfTokens} ${this.tokenIcon} token(s). They now have ${result.tokens} token(s).`
+        )
     } else {
       this.client.say(
         this.target,
@@ -424,16 +426,17 @@ class RequestTokens {
     )
 
     // add to history
-    await this.db.run(
-      'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      this.channel,
-      this.username,
-      this.context['username'],
-      'subtract',
-      this.numOfTokens,
-      this.songTitle,
-      Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
-    )
+    if (this.channel && this.username && this.numOfTokens !== undefined)
+      await this.db.run(
+        'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, song_title, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        this.channel,
+        this.username,
+        this.context['username'],
+        'subtract',
+        this.numOfTokens,
+        this.songTitle,
+        Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
+      )
 
     // speak to us
     result = await this.db.get(
@@ -513,24 +516,26 @@ class RequestTokens {
     }
 
     // add to history
-    await this.db.run(
-      'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-      this.channel,
-      this.recipient,
-      this.context['username'],
-      'add',
-      this.numOfTokens,
-      Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
-    )
-    await this.db.run(
-      'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-      this.channel,
-      this.username,
-      this.context['username'],
-      'subtract',
-      this.numOfTokens,
-      Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
-    )
+    if (this.channel && this.recipient && this.username && this.numOfTokens !== undefined) {
+      await this.db.run(
+        'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+        this.channel,
+        this.recipient,
+        this.context['username'],
+        'add',
+        this.numOfTokens,
+        Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
+      )
+      await this.db.run(
+        'INSERT INTO request_token_history (channel, username, mod_username, operation, amount, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+        this.channel,
+        this.username,
+        this.context['username'],
+        'subtract',
+        this.numOfTokens,
+        Math.floor(new Date() / MILLISECONDS_IN_A_SECOND)
+      )
+    }
 
     // speak to us
     recipientResult = await this.db.get(
