@@ -98,11 +98,11 @@ open({
             tokenSubTimeouts.splice(index, 1); 
           }
         }, 10e3)
-      }
 
-      const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: giftSubCount})
-      await rt.onSub()
-      delete rt
+        const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: giftSubCount})
+        await rt.onSub()
+        delete rt
+      }
     }
   }
 
