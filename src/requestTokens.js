@@ -23,7 +23,7 @@ class RequestTokens {
 
     this.target = target
     this.channel = target.substring(1, target.length)
-    this.username = username.toLowerCase()
+    this.username = username?.toLowerCase()
     this.recipient = recipient
     this.numOfTokens = numOfSubs
     this.songTitle = songTitle
@@ -115,10 +115,10 @@ class RequestTokens {
       }
     })
     if (!this.operation) this.operation = 'check'
-    if (this.songTitle) this.songTitle = this.songTitle.trim()
-    if (this.operation) this.operation = this.operation.toLowerCase()
-    if (this.username) this.username = this.username.toLowerCase()
-    if (this.recipient) this.recipient = this.recipient.toLowerCase()
+    this.songTitle = this.songTitle.trim()
+    this.operation = this.operation?.toLowerCase()
+    this.username = this.username?.toLowerCase()
+    this.recipient = this.recipient?.toLowerCase()
 
     const { username, recipient, operation, numOfTokens, songTitle } = this
     const mod = this.context['username']

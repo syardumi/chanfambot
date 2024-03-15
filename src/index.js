@@ -20,7 +20,7 @@ open({
     if (context['message-type'] !== 'chat') return // ignore messages that are not chat type
 
     // Remove whitespace from edges of chat message
-    const chatMsg = msg.trim().toLowerCase()
+    const chatMsg = msg?.trim().toLowerCase()
 
     // console.log(context)
 
