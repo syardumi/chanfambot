@@ -44,6 +44,7 @@ open({
   }
 
   async function onSubHandler(target, username, methods, msg, tags) {
+    console.log('Sub', {target, username})
     if (config.modules.requestTokens) {
       if (tokenSubTimeouts.includes(username)) return
       const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: 1})
@@ -53,6 +54,7 @@ open({
   }
 
   async function onReSubHandler(target, username, streakMonths, msg, tags, methods) {
+    console.log('ReSub', {target, username})
     if (config.modules.requestTokens) {
       if (tokenSubTimeouts.includes(username)) return
       const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: 1})
@@ -69,7 +71,7 @@ open({
     methods,
     tags
   ) {
-    // console.log('Sub Gift', {target, username})
+    console.log('Sub Gift', {target, username})
     if (config.modules.requestTokens) {
       if (tokenSubTimeouts.includes(username)) return
       const rt = new RequestTokens({ config, client, db, target, username, recipient, numOfSubs: 1})
@@ -79,7 +81,7 @@ open({
   }
 
   async function onSubMysteryHandler(target, username, giftSubCount, methods, tags) {
-    // console.log('Sub Mystery', { target, username, giftSubCount })
+    console.log('Sub Mystery', { target, username, giftSubCount })
     // client.say(
     //   target,
     //   `@${username} got ${giftSubCount} ${
