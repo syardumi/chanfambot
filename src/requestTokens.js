@@ -115,7 +115,7 @@ class RequestTokens {
       }
     })
     if (!this.operation) this.operation = 'check'
-    this.songTitle = this.songTitle.trim()
+    this.songTitle = this.songTitle?.trim()
     this.operation = this.operation?.toLowerCase()
     this.username = this.username?.toLowerCase()
     this.recipient = this.recipient?.toLowerCase()
