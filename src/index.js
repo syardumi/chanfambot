@@ -97,7 +97,7 @@ open({
           if (index > -1) { 
             tokenSubTimeouts.splice(index, 1); 
           }
-        }, 10e3)
+        }, 5e3 + (Math.random() * 5e3))
 
         const rt = new RequestTokens({ config, client, db, target, username, numOfSubs: giftSubCount})
         await rt.onSub()
