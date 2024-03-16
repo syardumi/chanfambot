@@ -8,7 +8,7 @@ const tmi = require('tmi.js')
 const sqlite3 = require('sqlite3')
 const { open } = require('sqlite')
 
-const tokenSubTimeouts = []
+let tokenSubTimeouts = []
 
 open({
   filename: config.dbLocation,
@@ -40,6 +40,14 @@ open({
 
     if (config.modules.amongUs) {
       AmongUs(target, context, chatMsg, client)
+    }
+
+    if (chatMsg === '!cfbot reset') {
+      tokenSubTimeouts = []
+      client.say(
+        target,
+        `...beep boop!`
+      )
     }
   }
 
